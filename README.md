@@ -1,7 +1,7 @@
 # Investment-Intelligence-Platform
 
 Folder structue 
-
+```
 Backend/
 │
 ├── data_cleaning/
@@ -22,3 +22,4 @@ Backend/
 ├── routers/                       # FastAPI route definitions.
 ├── utils/                         # Shared helper functions.
 └── requirements.txt               # Python dependencies.
+```
