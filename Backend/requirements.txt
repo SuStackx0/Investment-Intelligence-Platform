@@ -1,0 +1,6 @@
+yfinance
+fastapi
+uvicorn
+pandas
+numpy
+GoogleNews
