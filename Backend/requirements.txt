@@ -4,3 +4,8 @@ uvicorn
 pandas
 numpy
 GoogleNews
+fastparquet
+tqdm
+sentence_transformers
+chromadb
+openai
