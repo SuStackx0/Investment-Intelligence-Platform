@@ -238,7 +238,9 @@ def fetch_company_news(company):
 # -------------------------------
 if __name__ == "__main__":
     print(f"📆 Fetching news for NIFTY50 from {START_DATE} → {END_DATE}")
+
     max_workers = 6 # number of parallel threads
+
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_company = {executor.submit(fetch_company_news, company): company for company in NIFTY50}
@@ -253,4 +255,6 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"❌ Error for {company}: {e}")
 
+
     print("\n🎉 Done! JSONs saved in:", NEWS_FOLDER)
+

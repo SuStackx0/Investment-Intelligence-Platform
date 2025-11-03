@@ -68,6 +68,7 @@ for i, row in tqdm(df.iterrows(), total=len(df), ncols=100, desc="Embedding"):
 
     texts.append(text)
     ids.append(doc_id)
+
     company = str(row.get("company", "") or "")
     source = str(row.get("source_type", "") or "")
     date = str(row.get("date", "") or "")
@@ -77,6 +78,7 @@ for i, row in tqdm(df.iterrows(), total=len(df), ncols=100, desc="Embedding"):
         "source": source,
         "date": date
     })
+    new_count += 1
 
     new_count += 1
 
