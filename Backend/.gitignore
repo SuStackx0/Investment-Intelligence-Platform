@@ -1,1 +1,26 @@
+# Python cache and build
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Virtual environments
+venv/
+.env/
+
+# IDE configs
+.vscode/
+.idea/
+
+# Ignore all generated data
 data_cleaning/outputs/
+*.csv
+*.json
+*.pkl
+*.parquet
+*.db
+
+# OS files
+.DS_Store
+Thumbs.db
