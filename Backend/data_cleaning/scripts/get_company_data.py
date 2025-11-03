@@ -30,12 +30,40 @@ nifty_50_symbols = {
     "UPL": "UPL.NS", "WIPRO": "WIPRO.NS"
 }
 
+
+# -------------------------------
+# SAFE SAVE FUNCTION (append only)
+# -------------------------------
+def save_or_append_csv(new_df: pd.DataFrame, file_path: str):
+    """
+    Appends new data if it's not already in the existing file.
+    Assumes index (like period or date) differentiates records.
+    """
+    if os.path.exists(file_path):
+        try:
+            existing_df = pd.read_csv(file_path, index_col=0)
+        except Exception:
+            existing_df = pd.DataFrame()
+
+        # Merge without duplicates
+        combined = pd.concat([existing_df, new_df])
+        combined = combined[~combined.index.duplicated(keep="last")]
+
+        if not combined.equals(existing_df):
+            combined.to_csv(file_path)
+            print(f"  ↪️ Updated {os.path.basename(file_path)} ({len(combined) - len(existing_df)} new rows)")
+        else:
+            print(f"  ✅ No new data for {os.path.basename(file_path)}")
+    else:
+        new_df.to_csv(file_path)
+        print(f"  🆕 Created {os.path.basename(file_path)}")
+
+
 # -------------------------------
 # FETCH COMPANY FUNDAMENTALS
 # -------------------------------
 for company, symbol in nifty_50_symbols.items():
-    print(f"🏢 Fetching fundamentals for {company} ({symbol})...")
-
+    print(f"\n🏢 Fetching fundamentals for {company} ({symbol})...")
     company_folder = os.path.join(output_folder, company)
     os.makedirs(company_folder, exist_ok=True)
 
@@ -43,27 +71,31 @@ for company, symbol in nifty_50_symbols.items():
         ticker = yf.Ticker(symbol)
 
         # ---- Company Info ----
+        info_path = os.path.join(company_folder, "info.csv")
         info = pd.DataFrame([ticker.info])
-        info.to_csv(os.path.join(company_folder, "info.csv"), index=False)
+        save_or_append_csv(info, info_path)
 
         # ---- Financials ----
         financials = ticker.financials
         if not financials.empty:
-            financials.T.to_csv(os.path.join(company_folder, "income_statement.csv"))
+            fin_path = os.path.join(company_folder, "income_statement.csv")
+            save_or_append_csv(financials.T, fin_path)
 
         # ---- Balance Sheet ----
         balance_sheet = ticker.balance_sheet
         if not balance_sheet.empty:
-            balance_sheet.T.to_csv(os.path.join(company_folder, "balance_sheet.csv"))
+            bs_path = os.path.join(company_folder, "balance_sheet.csv")
+            save_or_append_csv(balance_sheet.T, bs_path)
 
         # ---- Cash Flow ----
         cashflow = ticker.cashflow
         if not cashflow.empty:
-            cashflow.T.to_csv(os.path.join(company_folder, "cashflow.csv"))
+            cf_path = os.path.join(company_folder, "cashflow.csv")
+            save_or_append_csv(cashflow.T, cf_path)
 
-        print(f"✅ Saved data for {company}\n")
+        print(f"✅ Done for {company}")
 
     except Exception as e:
-        print(f"❌ Error fetching {company}: {e}\n")
+        print(f"❌ Error fetching {company}: {e}")
 
-print("\n🚀 Done! All company data saved in 'company_data' folder.")
+print("\n🚀 Done! All company data updated in 'company_data' folder.")
