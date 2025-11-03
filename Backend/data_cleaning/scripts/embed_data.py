@@ -10,7 +10,7 @@ import numpy as np
 # -------------------------------
 DATA_PATH = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/data_cleaning/outputs/merged_source/combined_investment_source.parquet"
 CHROMA_PATH = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/services/chromadb"
-BATCH_SIZE = 100  # controls how often to commit embeddings
+BATCH_SIZE = 100  # how many records per commit batch
 
 # -------------------------------
 # LOAD DATA
@@ -33,33 +33,67 @@ client = chromadb.PersistentClient(path=CHROMA_PATH)
 collection = client.get_or_create_collection(name="investment_rag")
 
 # -------------------------------
-# EMBED + INSERT IN BATCHES
+# FIND EXISTING IDS
 # -------------------------------
-print("⚙️ Generating embeddings and inserting in batches...")
+print("🔍 Checking existing entries in ChromaDB...")
+existing_count = collection.count()
+print(f"📊 Existing embeddings: {existing_count}")
+
+# NOTE: Chroma doesn’t support listing all IDs directly, so we track via local cache
+# We'll create a local cache file that remembers which record IDs are embedded
+
+CACHE_FILE = os.path.join(CHROMA_PATH, "embedded_ids.txt")
+if os.path.exists(CACHE_FILE):
+    with open(CACHE_FILE, "r") as f:
+        embedded_ids = set(line.strip() for line in f)
+else:
+    embedded_ids = set()
+
+print(f"📁 Found {len(embedded_ids)} IDs in local cache")
+
+# -------------------------------
+# EMBED ONLY NEW DATA
+# -------------------------------
 texts, ids, metas = [], [], []
+new_count = 0
 
 for i, row in tqdm(df.iterrows(), total=len(df), ncols=100, desc="Embedding"):
+    doc_id = str(i)
+    if doc_id in embedded_ids:
+        continue
+
     text = str(row["text"]).strip()
     if not text:
         continue
 
     texts.append(text)
-    ids.append(str(i))
+    ids.append(doc_id)
     metas.append({
         "company": row.get("company", ""),
-        "source": row.get("source", "")
+        "source": row.get("source_type", ""),
+        "date": row.get("date", "")
     })
+    new_count += 1
 
     # ---- Batch commit ----
     if len(texts) >= BATCH_SIZE:
         embs = model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
         collection.add(ids=ids, embeddings=embs, documents=texts, metadatas=metas)
+
+        # update cache
+        with open(CACHE_FILE, "a") as f:
+            for _id in ids:
+                f.write(_id + "\n")
+
         texts, ids, metas = [], [], []
 
 # ---- Final leftover ----
 if texts:
     embs = model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
     collection.add(ids=ids, embeddings=embs, documents=texts, metadatas=metas)
+    with open(CACHE_FILE, "a") as f:
+        for _id in ids:
+            f.write(_id + "\n")
 
-print("✅ All data embedded and stored in ChromaDB!")
+print(f"✅ {new_count} new records embedded and stored in ChromaDB!")
 print(f"📁 DB location: {CHROMA_PATH}")

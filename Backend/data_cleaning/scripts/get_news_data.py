@@ -1,86 +1,4 @@
-# import os
-# import json
-# import datetime
-# from GoogleNews import GoogleNews
 
-# # -------------------------------
-# # CONFIG
-# # -------------------------------
-# START_DATE = "2025-01-01"
-# END_DATE = datetime.date.today().strftime("%Y-%m-%d")
-
-# OUTPUT_FOLDER = "new_output"
-# os.makedirs(OUTPUT_FOLDER, exist_ok=True)
-
-# NIFTY50 = [
-#     "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK", "HINDUNILVR", "ITC", "SBIN",
-#     "BHARTIARTL", "BAJFINANCE", "ASIANPAINT", "KOTAKBANK", "LT", "M&M", "MARUTI",
-#     "NESTLEIND", "NTPC", "POWERGRID", "TITAN", "SUNPHARMA", "ULTRACEMCO", "WIPRO",
-#     "ONGC", "ADANIENT", "ADANIPORTS", "AXISBANK", "COALINDIA", "BAJAJFINSV",
-#     "HCLTECH", "TECHM", "GRASIM", "TATASTEEL", "JSWSTEEL", "CIPLA", "DIVISLAB",
-#     "DRREDDY", "EICHERMOT", "HDFCLIFE", "HEROMOTOCO", "BPCL", "BRITANNIA", "INDUSINDBK",
-#     "APOLLOHOSP", "BAJAJ-AUTO", "SBILIFE", "TATACONSUM", "HINDALCO", "UPL", "SHRIRAMFIN",
-#     "TRENT"
-# ]
-
-# # -------------------------------
-# # FETCH FUNCTION
-# # -------------------------------
-# def fetch_company_news(company_name):
-#     """Fetch recent news for a given company"""
-#     print(f"📰 Fetching news for {company_name}...")
-
-#     file_path = os.path.join(OUTPUT_FOLDER, f"{company_name}.json")
-
-#     # Load old data if available
-#     existing_data = []
-#     if os.path.exists(file_path):
-#         with open(file_path, "r") as f:
-#             try:
-#                 existing_data = json.load(f)
-#             except json.JSONDecodeError:
-#                 existing_data = []
-
-#     existing_titles = {item["title"] for item in existing_data if "title" in item}
-
-#     # ✅ Initialize GoogleNews with date range
-#     news = GoogleNews(lang='en', region='IN', encode='utf-8')
-#     news.set_time_range(START_DATE, END_DATE)
-#     news.search(f"{company_name} stock news India")
-
-#     results = news.result()
-
-#     new_results = []
-#     for item in results:
-#         title = item.get("title", "")
-#         if title and title not in existing_titles:
-#             new_results.append({
-#                 "title": title,
-#                 "link": item.get("link", ""),
-#                 "published": item.get("date", ""),
-#                 "media": item.get("media", ""),
-#                 "desc": item.get("desc", "")
-#             })
-
-#     if new_results:
-#         print(f"✅ {len(new_results)} new articles found for {company_name}")
-#         updated_data = existing_data + new_results
-#         with open(file_path, "w") as f:
-#             json.dump(updated_data, f, indent=4)
-#     else:
-#         print(f"⚠️ No new articles found for {company_name}")
-
-# # -------------------------------
-# # MAIN
-# # -------------------------------
-# if __name__ == "__main__":
-#     print(f"📆 Fetching NIFTY50 news from {START_DATE} to {END_DATE}\n")
-#     for company in NIFTY50:
-#         try:
-#             fetch_company_news(company)
-#         except Exception as e:
-#             print(f"❌ Error fetching news for {company}: {e}")
-#!/usr/bin/env python3
 import os
 import json
 import datetime
@@ -94,7 +12,7 @@ from dateutil import parser
 from datetime import timedelta
 import re
 import sys
-
+from concurrent.futures import ThreadPoolExecutor, as_completed
 # -------------------------------
 # CONFIG
 # -------------------------------
@@ -320,12 +238,19 @@ def fetch_company_news(company):
 # -------------------------------
 if __name__ == "__main__":
     print(f"📆 Fetching news for NIFTY50 from {START_DATE} → {END_DATE}")
-    for company in NIFTY50:
-        try:
-            fetch_company_news(company)
-        except KeyboardInterrupt:
-            print("\n⏹️ Stopped by user.")
-            break
-        except Exception as e:
-            print(f"❌ Error for {company}: {e}")
+    max_workers = 4  # adjust based on your internet + system load
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_company = {executor.submit(fetch_company_news, company): company for company in NIFTY50}
+
+        for future in as_completed(future_to_company):
+            company = future_to_company[future]
+            try:
+                future.result()
+            except KeyboardInterrupt:
+                print("\n⏹️ Stopped by user.")
+                break
+            except Exception as e:
+                print(f"❌ Error for {company}: {e}")
+
     print("\n🎉 Done! JSONs saved in:", NEWS_FOLDER)
