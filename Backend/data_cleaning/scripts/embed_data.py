@@ -1,16 +1,32 @@
+import os
+import re
 import pandas as pd
 from tqdm import tqdm
 from sentence_transformers import SentenceTransformer
 import chromadb
-import os
-import numpy as np
 
 # -------------------------------
 # CONFIG
 # -------------------------------
 DATA_PATH = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/data_cleaning/outputs/merged_source/combined_investment_source.parquet"
 CHROMA_PATH = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/services/chromadb"
-BATCH_SIZE = 100  # how many records per commit batch
+BATCH_SIZE = 100  # number of chunks per batch
+MAX_WORDS = 250
+OVERLAP = 50
+
+# -------------------------------
+# UTILS
+# -------------------------------
+def chunk_text(text, max_words=MAX_WORDS, overlap=OVERLAP):
+    """Split text into overlapping word chunks."""
+    words = re.split(r"\s+", text)
+    chunks = []
+    for i in range(0, len(words), max_words - overlap):
+        chunk = " ".join(words[i:i + max_words]).strip()
+        if len(chunk.split()) > 30:  # skip too-small chunks
+            chunks.append(chunk)
+    return chunks
+
 
 # -------------------------------
 # LOAD DATA
@@ -33,15 +49,8 @@ client = chromadb.PersistentClient(path=CHROMA_PATH)
 collection = client.get_or_create_collection(name="investment_rag")
 
 # -------------------------------
-# FIND EXISTING IDS
+# LOCAL CACHE
 # -------------------------------
-print("🔍 Checking existing entries in ChromaDB...")
-existing_count = collection.count()
-print(f"📊 Existing embeddings: {existing_count}")
-
-# NOTE: Chroma doesn’t support listing all IDs directly, so we track via local cache
-# We'll create a local cache file that remembers which record IDs are embedded
-
 CACHE_FILE = os.path.join(CHROMA_PATH, "embedded_ids.txt")
 if os.path.exists(CACHE_FILE):
     with open(CACHE_FILE, "r") as f:
@@ -49,7 +58,7 @@ if os.path.exists(CACHE_FILE):
 else:
     embedded_ids = set()
 
-print(f"📁 Found {len(embedded_ids)} IDs in local cache")
+print(f"📁 Found {len(embedded_ids)} cached IDs")
 
 # -------------------------------
 # EMBED ONLY NEW DATA
@@ -58,49 +67,53 @@ texts, ids, metas = [], [], []
 new_count = 0
 
 for i, row in tqdm(df.iterrows(), total=len(df), ncols=100, desc="Embedding"):
-    doc_id = str(i)
-    if doc_id in embedded_ids:
+    base_id = str(i)
+    if base_id in embedded_ids:
         continue
 
-    text = str(row["text"]).strip()
+    text = str(row.get("text", "")).strip()
     if not text:
         continue
-
-    texts.append(text)
-    ids.append(doc_id)
 
     company = str(row.get("company", "") or "")
     source = str(row.get("source_type", "") or "")
     date = str(row.get("date", "") or "")
 
-    metas.append({
-        "company": company,
-        "source": source,
-        "date": date
-    })
-    new_count += 1
+    chunks = chunk_text(text)
+    if not chunks:
+        continue
 
-    new_count += 1
+    for j, chunk in enumerate(chunks):
+        chunk_id = f"{base_id}_{j}"
+        ids.append(chunk_id)
+        texts.append(chunk)
+        metas.append({
+            "company": company,
+            "source": source,
+            "date": date,
+            "chunk_index": j
+        })
+        new_count += 1
 
-    # ---- Batch commit ----
-    if len(texts) >= BATCH_SIZE:
-        embs = model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
-        collection.add(ids=ids, embeddings=embs, documents=texts, metadatas=metas)
+        # ---- Batch commit ----
+        if len(texts) >= BATCH_SIZE:
+            embs = model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
+            collection.add(ids=ids, embeddings=embs, documents=texts, metadatas=metas)
 
-        # update cache
-        with open(CACHE_FILE, "a") as f:
-            for _id in ids:
-                f.write(_id + "\n")
+            # Update cache
+            with open(CACHE_FILE, "a") as f:
+                for cid in ids:
+                    f.write(cid + "\n")
 
-        texts, ids, metas = [], [], []
+            texts, ids, metas = [], [], []
 
 # ---- Final leftover ----
 if texts:
     embs = model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
     collection.add(ids=ids, embeddings=embs, documents=texts, metadatas=metas)
     with open(CACHE_FILE, "a") as f:
-        for _id in ids:
-            f.write(_id + "\n")
+        for cid in ids:
+            f.write(cid + "\n")
 
-print(f"✅ {new_count} new records embedded and stored in ChromaDB!")
+print(f"✅ Embedded and stored {new_count} new chunks in ChromaDB!")
 print(f"📁 DB location: {CHROMA_PATH}")

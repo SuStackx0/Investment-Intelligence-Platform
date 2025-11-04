@@ -21,6 +21,10 @@ data_cleaning/outputs/
 *.parquet
 *.db
 
+
+#db
+services/chromadb/
+
 # OS files
 .DS_Store
 Thumbs.db
