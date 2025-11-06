@@ -14,7 +14,7 @@ venv/
 .idea/
 
 # Ignore all generated data
-data_cleaning/outputs/
+servicesdata_cleaning/outputs/
 *.csv
 *.json
 *.pkl
@@ -23,7 +23,7 @@ data_cleaning/outputs/
 
 
 #db
-services/chromadb/
+db/chromadb/
 
 # OS files
 .DS_Store

@@ -2,24 +2,57 @@
 
 Folder structue 
 ```
-Backend/
+Investment-Intelligence-Platform/
 │
-├── data_cleaning/
-│   ├── scripts/
-│   │   ├── get_stock_data.py      # Fetches historical stock price data for NIFTY50 companies.
-│   │   ├── get_company_data.py    # Scrapes or fetches company financials (balance sheet, cash flow, etc.)
-│   │   ├── get_news_data.py       # Collects recent financial news from multiple sources and standardizes format.
+├── Backend/
+│   ├── services/
+│   │   ├── data_ingestion/
+│   │   │   ├── app.py
+│   │   │   ├── fetch_news.py
+│   │   │   ├── fetch_stocks.py
+│   │   │   ├── Dockerfile
+│   │   │   └── requirements.txt
+│   │   │
+│   │   ├── data_cleaning/
+│   │   │   ├── app.py
+│   │   │   ├── clean_merge.py
+│   │   │   ├── Dockerfile
+│   │   │   └── requirements.txt
+│   │   │
+│   │   ├── embedding/
+│   │   │   ├── app.py
+│   │   │   ├── embed_utils.py
+│   │   │   ├── Dockerfile
+│   │   │   └── requirements.txt
+│   │   │
+│   │   ├── retrieval/
+│   │   │   ├── app.py
+│   │   │   ├── query_utils.py
+│   │   │   ├── Dockerfile
+│   │   │   └── requirements.txt
+│   │   │
+│   │   ├── llm/
+│   │   │   ├── app.py
+│   │   │   ├── openai_integration.py
+│   │   │   ├── Dockerfile
+│   │   │   └── requirements.txt
 │   │
-│   ├── outputs/                   # Stores cleaned or raw output files from data scripts.
-│   │   ├── stock_output/          # CSV files for each company’s stock prices.
-│   │   ├── company_output/        # CSV/JSON financial statements.
-│   │   ├── news_output/           # Standardized JSONs containing aggregated news data.
+│   ├── api_gateway/
+│   │   ├── app.py
+│   │   ├── router.py
+│   │   ├── Dockerfile
+│   │   └── requirements.txt
 │   │
-│   └── README.md                  # (You are here) Explains structure, usage, and setup.
+│   ├── shared_utils/
+│   │   ├── config.py
+│   │   ├── logging_utils.py
+│   │   └── constants.py
+│   │
+│   ├── docker-compose.yml
+│   └── .env
 │
-├── main.py                        # Entry point for the backend API or data service.
-├── services/                      # Core service modules (API, embeddings, ML pipeline, etc.)
-├── routers/                       # FastAPI route definitions.
-├── utils/                         # Shared helper functions.
-└── requirements.txt               # Python dependencies.
+└── Frontend/
+    ├── src/
+    └── package.json
+
 ```
