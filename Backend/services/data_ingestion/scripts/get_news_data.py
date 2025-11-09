@@ -19,7 +19,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 START_DATE = "2025-01-01"
 END_DATE = datetime.date.today().strftime("%Y-%m-%d")
 
-OUTPUT_FOLDER = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/data_cleaning/outputs"
+OUTPUT_FOLDER = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/services/data_ingestion/outputs"
 NEWS_FOLDER = os.path.join(OUTPUT_FOLDER, "news")
 os.makedirs(NEWS_FOLDER, exist_ok=True)
 

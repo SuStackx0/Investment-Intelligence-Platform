@@ -9,3 +9,6 @@ tqdm
 sentence_transformers
 chromadb
 openai
+torch
+transformers 
+accelerate

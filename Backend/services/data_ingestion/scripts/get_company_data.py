@@ -6,7 +6,7 @@ from datetime import datetime
 # -------------------------------
 # CONFIGURATION
 # -------------------------------
-output_folder = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/data_cleaning/outputs/company_data"
+output_folder = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/services/data_ingestion/outputs/company_data"
 os.makedirs(output_folder, exist_ok=True)
 
 # -------------------------------
