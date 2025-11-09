@@ -40,6 +40,6 @@ def retrieve_context(query: str, prefetch_k: int = 20, final_k: int = 5):
     
     reranked = sorted(zip(docs, rerank_scores), key=lambda x: x[1], reverse=True)
     top_docs = [doc for doc, _ in reranked[:final_k]]
-
+    context="\n\n".join(top_docs)
     
-    return "\n\n".join(top_docs)
+    return context[:1500]
