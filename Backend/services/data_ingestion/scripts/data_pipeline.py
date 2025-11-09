@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 # CONFIG
 # -------------------------------
 PROJECT_ROOT = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend"
-SCRIPTS_DIR = os.path.join(PROJECT_ROOT, "data_cleaning", "scripts")
+SCRIPTS_DIR = os.path.join(PROJECT_ROOT,"services", "data_ingestion", "scripts")
 
 PARALLEL_SCRIPTS = [
     "get_company_data.py",
