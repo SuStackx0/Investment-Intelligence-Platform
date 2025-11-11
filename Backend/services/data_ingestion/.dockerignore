@@ -1,0 +1,30 @@
+# Ignore Python cache & venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# Ignore logs and local data
+logs/
+data/raw/
+data/tmp/
+*.log
+
+# Ignore environment and secrets
+.env
+*.env
+
+# Ignore git and IDE files
+.git/
+.gitignore
+*.swp
+*.bak
+*.tmp
+.vscode/
+.idea/
+
+# Ignore Docker build cache if any
+Dockerfile*
+docker-compose.yml

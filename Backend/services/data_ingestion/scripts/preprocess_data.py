@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 
 
-BASE = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/data_cleaning/outputs"
+BASE = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/services/data_ingestion/outputs"
 STOCK_PATH = os.path.join(BASE, "stock_data")
 NEWS_PATH = os.path.join(BASE, "news")
 COMPANY_PATH = os.path.join(BASE, "company_data")

@@ -1,0 +1,28 @@
+# ---- Core Framework ----
+fastapi
+uvicorn
+
+# ---- Data Handling ----
+pandas
+numpy
+pyarrow
+python-dateutil
+
+# ---- Finance APIs ----
+yfinance
+
+# ---- Web & News Scraping ----
+requests
+beautifulsoup4
+lxml
+feedparser
+GoogleNews
+html5lib
+tqdm
+
+# ---- Concurrency & Logging ----
+concurrent-log-handler
+
+# ---- Utility ----
+dateparser
+fastparquet
