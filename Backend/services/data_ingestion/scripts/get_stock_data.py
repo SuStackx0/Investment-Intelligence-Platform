@@ -9,8 +9,10 @@ from datetime import datetime, timedelta
 start_date = "2025-01-01"
 end_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
-output_folder = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/services/data_ingestion/outputs/stock_data"
+# Always use Docker path inside the container
+output_folder = "/app/outputs/stock_data"
 os.makedirs(output_folder, exist_ok=True)
+
 
 # -------------------------------
 # NIFTY 50 SYMBOLS
