@@ -8,8 +8,8 @@ import chromadb
 # -------------------------------
 # CONFIG
 # -------------------------------
-DATA_PATH = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/services/data_ingestion/outputs/merged_source"
-CHROMA_PATH = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/db/chromadb"
+DATA_PATH = "/app/outputs/merged_source"
+CHROMA_PATH = "/app/chromadb"
 BATCH_SIZE = 100  # number of chunks per batch
 MAX_WORDS = 250
 OVERLAP = 50
