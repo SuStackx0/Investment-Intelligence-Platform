@@ -1,7 +1,5 @@
 fastapi
 uvicorn[standard]
-pandas
 sentence-transformers
 chromadb
-tqdm
-python-multipart  # Recommended for FastAPI forms (optional, but good practice)
+pydantic
