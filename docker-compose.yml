@@ -1,30 +1,28 @@
-version: "3.9"
-
 services:
   data_ingestion_service:
     build:
-      context: ./data_ingestion
+      context: Backend/services/data_ingestion
       dockerfile: Dockerfile
     container_name: data_ingestion_service
     ports:
       - "8010:8010"
     volumes:
-      - ./data_ingestion/logs:/app/logs
-      - ./data_ingestion/outputs/company_data:/app/outputs/company_data
-      - ./data_ingestion/outputs/news:/app/outputs/news
-      - ./data_ingestion/outputs/stock_data:/app/outputs/stock_data
-      - ./data_ingestion/outputs/merged_source:/app/outputs/merged_source
+      - ./services/data_ingestion/logs:/app/logs
+      - ./services/data_ingestion/outputs/company_data:/app/outputs/company_data
+      - ./services/data_ingestion/outputs/news:/app/outputs/news
+      - ./services/data_ingestion/outputs/stock_data:/app/outputs/stock_data
+      - ./services/data_ingestion/outputs/merged_source:/app/outputs/merged_source
     restart: unless-stopped
 
   embedding_service:
     build:
-      context: ./embedding
+      context: Backend/services/embedding
       dockerfile: Dockerfile
     container_name: embedding_service
     ports:
       - "8030:8000"
     volumes:
-      - ./data_ingestion/outputs/merged_source:/app/outputs/merged_source
+      - ./services/data_ingestion/outputs/merged_source:/app/outputs/merged_source
       - ./db/chromadb:/app/chromadb
     depends_on:
       - data_ingestion_service
@@ -32,7 +30,7 @@ services:
 
   retrieval_service:
     build:
-      context: ./retrieval
+      context: Backend/services/retrieval
       dockerfile: Dockerfile
     container_name: retrieval_service
     ports:
@@ -45,7 +43,7 @@ services:
 
   llm_service:
     build:
-      context: ./llm
+      context: Backend/services/llm
       dockerfile: Dockerfile
     container_name: llm_service
     ports:
@@ -56,7 +54,7 @@ services:
 
   orchestrator_service:
     build:
-      context: ./Backend/
+      context: Backend
       dockerfile: Dockerfile.orchestrator
     container_name: orchestrator_service
     ports:
