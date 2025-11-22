@@ -35,3 +35,8 @@ EXPOSE 8081
 # Run Server
 # -----------------------------
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8081"]
+
+
+# docker run -d -p 8081:8081 --name llm_service llm_service
+
+

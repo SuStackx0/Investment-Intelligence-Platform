@@ -5,8 +5,9 @@ import torch
 # -------------------------------
 # CONFIG
 # -------------------------------
-CHROMA_PATH = "/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/db/chromadb"
-COLLECTION_NAME = "investment_rag"
+CHROMA_PATH = "/app/chromadb"
+
+COLLECTION_NAME = "investment_rag_test"
 
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 RERANKER_MODEL = "cross-encoder/ms-marco-TinyBERT-L-2-v2"

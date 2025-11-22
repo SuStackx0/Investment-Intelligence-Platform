@@ -26,9 +26,14 @@ COPY . .
 # ------------------------------
 # Expose port
 # ------------------------------
-EXPOSE 8002
+EXPOSE 8070
 
 # ------------------------------
 # Run API
 # ------------------------------
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8070"]
+
+
+# docker run -d -p 8070:8070 \  --name retrieval_service \
+#   -v /Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/db/chromadb:/app/chromadb \
+#   retrieval_service
