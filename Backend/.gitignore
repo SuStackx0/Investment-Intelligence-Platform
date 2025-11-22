@@ -30,4 +30,4 @@ servicesdata_cleaning/outputs/
 .DS_Store
 Thumbs.db
 
-
+*.pickle

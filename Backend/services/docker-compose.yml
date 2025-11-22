@@ -53,3 +53,15 @@ services:
     depends_on:
       - retrieval_service
     restart: unless-stopped
+
+  orchestrator_service:
+    build:
+      context: Backend/
+      dockerfile: Dockerfile.orchestrator
+    container_name: orchestrator_service
+    ports:
+      - "8090:8090"
+    depends_on:
+      - retrieval_service
+      - llm_service
+    restart: unless-stopped
