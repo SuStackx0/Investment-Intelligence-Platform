@@ -7,11 +7,11 @@ services:
     ports:
       - "8010:8010"
     volumes:
-      - ./services/data_ingestion/logs:/app/logs
-      - ./services/data_ingestion/outputs/company_data:/app/outputs/company_data
-      - ./services/data_ingestion/outputs/news:/app/outputs/news
-      - ./services/data_ingestion/outputs/stock_data:/app/outputs/stock_data
-      - ./services/data_ingestion/outputs/merged_source:/app/outputs/merged_source
+      - Backend/services/data_ingestion/logs:/app/logs
+      - Backend/services/data_ingestion/outputs/company_data:/app/outputs/company_data
+      - Backend/services/data_ingestion/outputs/news:/app/outputs/news
+      - Backend/services/data_ingestion/outputs/stock_data:/app/outputs/stock_data
+      - Backend/services/data_ingestion/outputs/merged_source:/app/outputs/merged_source
     restart: unless-stopped
 
   embedding_service:
@@ -22,8 +22,8 @@ services:
     ports:
       - "8030:8000"
     volumes:
-      - ./services/data_ingestion/outputs/merged_source:/app/outputs/merged_source
-      - ./db/chromadb:/app/chromadb
+      - Backend/services/data_ingestion/outputs/merged_source:/app/outputs/merged_source
+      - Backend/services/db/chromadb:/app/chromadb
     depends_on:
       - data_ingestion_service
     restart: unless-stopped
@@ -36,7 +36,7 @@ services:
     ports:
       - "8070:8070"
     volumes:
-      - ./db/chromadb:/app/chromadb
+      - Backend/services/db/chromadb:/app/chromadb
     depends_on:
       - embedding_service
     restart: unless-stopped
