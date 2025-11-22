@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  data_ingestion_service:
+    build:
+      context: ./data_ingestion
+      dockerfile: Dockerfile
+    container_name: data_ingestion_service
+    ports:
+      - "8010:8010"
+    volumes:
+      - ./data_ingestion/logs:/app/logs
+      - ./data_ingestion/outputs/company_data:/app/outputs/company_data
+      - ./data_ingestion/outputs/news:/app/outputs/news
+      - ./data_ingestion/outputs/stock_data:/app/outputs/stock_data
+      - ./data_ingestion/outputs/merged_source:/app/outputs/merged_source
+    restart: unless-stopped
+
+  embedding_service:
+    build:
+      context: ./embedding
+      dockerfile: Dockerfile
+    container_name: embedding_service
+    ports:
+      - "8030:8000"
+    volumes:
+      - ./data_ingestion/outputs/merged_source:/app/outputs/merged_source
+      - ./db/chromadb:/app/chromadb
+    depends_on:
+      - data_ingestion_service
+    restart: unless-stopped
+
+  retrieval_service:
+    build:
+      context: ./retrieval
+      dockerfile: Dockerfile
+    container_name: retrieval_service
+    ports:
+      - "8070:8070"
+    volumes:
+      - ./db/chromadb:/app/chromadb
+    depends_on:
+      - embedding_service
+    restart: unless-stopped
+
+  llm_service:
+    build:
+      context: ./llm
+      dockerfile: Dockerfile
+    container_name: llm_service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - retrieval_service
+    restart: unless-stopped

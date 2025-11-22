@@ -8,7 +8,8 @@ __pycache__/
 # Virtual environments
 venv/
 .env/
-
+*.sqlite3
+*.bin
 # IDE configs
 .vscode/
 .idea/
@@ -23,7 +24,7 @@ servicesdata_cleaning/outputs/
 
 
 #db
-db/chromadb/
+/Users/sumanthg/Documents/sug/projects/Intelligent-investement-platform/Backend/services/db/
 
 # OS files
 .DS_Store
