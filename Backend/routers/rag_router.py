@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from services.retrieval.retrieval_service import retrieve_context
-from services.llm.llm_service import get_llm_response
+from Backend.services.llm.main import get_llm_response
 
 rag_router= APIRouter(prefix="/rag",tags=["RAG"])
 
