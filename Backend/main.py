@@ -79,7 +79,7 @@ def ask_user(req: QueryRequest):
                 "query": req.query,
                 "context": context
             },
-            timeout=60
+            timeout=180
         ).json()
 
         logger.info("LLM Service response received successfully")
