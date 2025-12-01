@@ -9,7 +9,7 @@ from common.logging_config import setup_logger  # <-- ADD THIS
 
 app = FastAPI(title="Data Ingestion Service")
 
-# Initialize logger
+
 logger = setup_logger("data_ingestion_service")
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -21,9 +21,7 @@ PARALLEL_SCRIPTS = ["get_company_data.py", "get_news_data.py", "get_stock_data.p
 SEQUENTIAL_SCRIPTS = ["preprocess_data.py"]
 
 
-# ======================================================
-# Request Logging Middleware
-# ======================================================
+
 @app.middleware("http")
 async def log_middle(request: Request, call_next):
     logger.info(f"Incoming request → {request.method} {request.url}")
@@ -37,9 +35,6 @@ async def log_middle(request: Request, call_next):
         raise
 
 
-# ======================================================
-# Script Runner
-# ======================================================
 def run_script(script_name):
     script_path = os.path.join(SCRIPTS_DIR, script_name)
     log_file = os.path.join(LOG_DIR, f"{script_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
